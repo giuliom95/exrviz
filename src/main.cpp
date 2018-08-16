@@ -12,12 +12,16 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     QWidget window;
     window.resize(320, 240);
-    window.show();
     window.setWindowTitle("Hello Qt5!");
 
-    OGLWidget* oglWidget = new OGLWidget(&window);
-    oglWidget->resize(300,200);
-    oglWidget->show();
+    QVBoxLayout* mainLayout = new QVBoxLayout;
+    mainLayout->setContentsMargins(0,0,0,0);
+
+    OGLWidget* oglWidget = new OGLWidget;
+    
+    mainLayout->addWidget(oglWidget);
+    window.setLayout(mainLayout);
+    window.show();
 
     return app.exec();
 }

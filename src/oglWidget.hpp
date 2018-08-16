@@ -7,6 +7,7 @@
 
 class OGLWidget : public QOpenGLWidget {
 public:
+    OGLWidget() : QOpenGLWidget{} {};
     OGLWidget(QWidget* parent) : QOpenGLWidget{parent} {};
 
 protected:
