@@ -5,7 +5,7 @@
 
 #include <QtWidgets>
 
-class OGLWidget : public QOpenGLWidget {
+class OGLWidget : public QOpenGLWidget, protected QOpenGLFunctions {
 public:
     OGLWidget() : QOpenGLWidget{} {};
     OGLWidget(QWidget* parent) : QOpenGLWidget{parent} {};
