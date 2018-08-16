@@ -1,10 +1,12 @@
 #include <iostream>
 
+
 #include <ImfRgbaFile.h>
 #include <ImfRgba.h>
 
 #include <QtWidgets>
-#include <QtGui>
+
+#include "oglWidget.hpp"
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
@@ -12,6 +14,10 @@ int main(int argc, char *argv[]) {
     window.resize(320, 240);
     window.show();
     window.setWindowTitle("Hello Qt5!");
-    std::cout << "Hello Qt5!" << std::endl;
+
+    OGLWidget* oglWidget = new OGLWidget(&window);
+    oglWidget->resize(300,200);
+    oglWidget->show();
+
     return app.exec();
 }
