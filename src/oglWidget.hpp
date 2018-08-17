@@ -2,6 +2,8 @@
 #define OGL_WIDGET_HPP
 
 #include <iostream>
+#include <vector>
+#include <array>
 
 #include <QtWidgets>
 
@@ -14,6 +16,9 @@ protected:
     void initializeGL();
     void resizeGL(int w, int h);
     void paintGL();
+
+private:
+    GLuint textureId;
 };
 
 #endif
