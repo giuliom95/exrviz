@@ -33,7 +33,8 @@ int main(int argc, char** argv) {
 	mainLayout->setContentsMargins(0,0,0,0);
 
 	OGLWidget* oglWidget = new OGLWidget;
-	
+	oglWidget->setMouseTracking(true);
+
 	mainLayout->addWidget(oglWidget);
 	window.setLayout(mainLayout);
 	window.show();

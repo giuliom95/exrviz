@@ -20,19 +20,28 @@ void OGLWidget::initializeGL() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
+	// Just a placeholder
 	const std::vector<std::array<uint8_t, 4>> img{256*256, {255,0,255,255}};
-	changeImage(img, 128, 128);
+	changeImage(img, 256, 256);
 }
 
 void OGLWidget::resizeGL(int w, int h) {
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, w, h, 0, -1, +1);
-	glMatrixMode( GL_MODELVIEW ); 
-	glLoadIdentity();
+	widgetWidth = w;
+	widgetHeight = h;
 }
 
 void OGLWidget::paintGL() {
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(
+		-imageTranslationX,
+		-imageTranslationX + widgetWidth,
+		-imageTranslationY + widgetHeight,
+		-imageTranslationY, 
+		-1, +1);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
 	glClear(GL_COLOR_BUFFER_BIT);
 	glBindTexture(GL_TEXTURE_2D, textureId);
 	glBegin(GL_QUADS); 
@@ -41,4 +50,31 @@ void OGLWidget::paintGL() {
 		glTexCoord2f(1.f, 1.f); glVertex2f(imageWidth, imageHeight);
 		glTexCoord2f(0.f, 1.f); glVertex2f(0, imageHeight);
 	glEnd();
+}
+
+void OGLWidget::mousePressEvent(QMouseEvent* event) {
+	mousePressed = true;
+	const auto mousePos = event->screenPos();
+	lastMouseX = (int)mousePos.x();
+	lastMouseY = (int)mousePos.y();
+}
+
+void OGLWidget::mouseReleaseEvent(QMouseEvent* event) {
+	mousePressed = false;
+	update();
+}
+
+void OGLWidget::mouseMoveEvent(QMouseEvent* event) {
+	if(mousePressed) {
+		const auto mousePos = event->screenPos();
+		const int curMouseX = mousePos.x();
+		const int curMouseY = mousePos.y(); 
+
+		imageTranslationX += curMouseX - lastMouseX;
+		imageTranslationY += curMouseY - lastMouseY;
+		lastMouseX = curMouseX;
+		lastMouseY = curMouseY;
+		
+		update();
+	}
 }
