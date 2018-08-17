@@ -5,7 +5,7 @@ void OGLWidget::changeImage(const std::vector<std::array<uint8_t, 4>>& img,
 	imageWidth = w;
 	imageHeight = h;
 	glBindTexture(GL_TEXTURE_2D, textureId);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, img.data());
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, img.data());
 }
 
 
