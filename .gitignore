@@ -1,4 +1,5 @@
 *.o
+*.exr
 bin/
 .qmake*
 Makefile
