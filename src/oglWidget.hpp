@@ -26,10 +26,10 @@ protected:
 	void wheelEvent(QWheelEvent *event);
 
 private:
-	int widgetWidth,	widgetHeight;
-	int imageWidth,		imageHeight;
-	int cameraPanX,		cameraPanY;
-	int lastMouseX,		lastMouseY;
+	int		widgetWidth,	widgetHeight;
+	int		imageWidth,		imageHeight;
+	float	cameraPanX,		cameraPanY;
+	float	lastMouseX,		lastMouseY;
 
 	float zoomFactor;
 	float widgetAspectRatio;

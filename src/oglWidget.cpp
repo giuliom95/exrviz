@@ -65,8 +65,6 @@ void OGLWidget::mousePressEvent(QMouseEvent* event) {
 	const auto mousePos = event->screenPos();
 	lastMouseX = (int)mousePos.x();
 	lastMouseY = (int)mousePos.y();
-	//std::cout << event->x() << " " << event->y() << " ";
-	//std::cout << cameraPanX << " " << cameraPanY << std::endl;
 }
 
 void OGLWidget::mouseReleaseEvent(QMouseEvent* event) {
@@ -93,13 +91,17 @@ void OGLWidget::mouseMoveEvent(QMouseEvent* event) {
 
 void OGLWidget::wheelEvent(QWheelEvent *event) {
 	const auto mousePos = event->pos();
-	const auto scroll = event->angleDelta().y();
-	const auto direction = (scroll > 0) - (scroll < 0);
+	const auto scroll = event->angleDelta().y() / 120.f;
 	
-	zoomFactor += 0.5*direction;
+	cameraPanX += mousePos.x() / zoomFactor;
+	cameraPanY += mousePos.y() / zoomFactor;
+
+	zoomFactor += 0.5*scroll;
 	zoomFactor = std::max(0.5f, zoomFactor);
 	zoomFactor = std::min(10.f, zoomFactor);
 
-	//std::cout << zoomFactor << std::endl;
+	cameraPanX -= mousePos.x() / zoomFactor;
+	cameraPanY -= mousePos.y() / zoomFactor;
+
 	update();
 }
