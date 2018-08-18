@@ -1,5 +1,11 @@
 #include "oglWidget.hpp"
 
+OGLWidget::OGLWidget() :	QOpenGLWidget{},
+							cameraPanX{0},
+							cameraPanY{0},
+							zoomFactor{1},
+							mousePressed{false} {};
+
 void OGLWidget::changeImage(const std::vector<std::array<uint8_t, 4>>& img, 
 							const int w, const int h) {
 	imageWidth = w;
@@ -28,16 +34,18 @@ void OGLWidget::initializeGL() {
 void OGLWidget::resizeGL(int w, int h) {
 	widgetWidth = w;
 	widgetHeight = h;
+	widgetAspectRatio = (float)w / h;
 }
 
 void OGLWidget::paintGL() {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
+	const auto invZoom = 1 / zoomFactor;
 	glOrtho(
-		-imageTranslationX,
-		-imageTranslationX + widgetWidth,
-		-imageTranslationY + widgetHeight,
-		-imageTranslationY, 
+		cameraPanX,
+		cameraPanX + widgetWidth*invZoom,
+		cameraPanY + widgetHeight*invZoom,
+		cameraPanY, 
 		-1, +1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -57,6 +65,8 @@ void OGLWidget::mousePressEvent(QMouseEvent* event) {
 	const auto mousePos = event->screenPos();
 	lastMouseX = (int)mousePos.x();
 	lastMouseY = (int)mousePos.y();
+	//std::cout << event->x() << " " << event->y() << " ";
+	//std::cout << cameraPanX << " " << cameraPanY << std::endl;
 }
 
 void OGLWidget::mouseReleaseEvent(QMouseEvent* event) {
@@ -70,11 +80,26 @@ void OGLWidget::mouseMoveEvent(QMouseEvent* event) {
 		const int curMouseX = mousePos.x();
 		const int curMouseY = mousePos.y(); 
 
-		imageTranslationX += curMouseX - lastMouseX;
-		imageTranslationY += curMouseY - lastMouseY;
+		// Movement speed must be inversely proportional to zoom factor
+		const auto invZoom = 1 / zoomFactor;
+		cameraPanX -= invZoom*(curMouseX - lastMouseX);
+		cameraPanY -= invZoom*(curMouseY - lastMouseY);
 		lastMouseX = curMouseX;
 		lastMouseY = curMouseY;
-		
+
 		update();
 	}
+}
+
+void OGLWidget::wheelEvent(QWheelEvent *event) {
+	const auto mousePos = event->pos();
+	const auto scroll = event->angleDelta().y();
+	const auto direction = (scroll > 0) - (scroll < 0);
+	
+	zoomFactor += 0.5*direction;
+	zoomFactor = std::max(0.5f, zoomFactor);
+	zoomFactor = std::min(10.f, zoomFactor);
+
+	//std::cout << zoomFactor << std::endl;
+	update();
 }
