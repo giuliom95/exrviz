@@ -26,16 +26,24 @@ void read_exr(	const char* fileName,
 int main(int argc, char** argv) {
 	QApplication app(argc, argv);
 	QWidget window;
-	window.resize(320, 240);
-	window.setWindowTitle("Hello Qt5!");
+	window.resize(500, 500);
+	window.setWindowTitle("exrviz");
 
 	QVBoxLayout* mainLayout = new QVBoxLayout;
 	mainLayout->setContentsMargins(0,0,0,0);
+
+	QWidget* pixelInfoLayoutContainer = new QWidget;	// This is used to give a fixed height to the layout
+	pixelInfoLayoutContainer->setFixedHeight(40);
+	QHBoxLayout* pixelInfoLayout = new QHBoxLayout;
+	QLabel* pixelPositionLabel = new QLabel("PIXEL");
+	pixelInfoLayout->addWidget(pixelPositionLabel);
+	pixelInfoLayoutContainer->setLayout(pixelInfoLayout);
 
 	OGLWidget* oglWidget = new OGLWidget;
 	oglWidget->setMouseTracking(true);
 
 	mainLayout->addWidget(oglWidget);
+	mainLayout->addWidget(pixelInfoLayoutContainer);
 	window.setLayout(mainLayout);
 	window.show();
 
@@ -57,8 +65,6 @@ int main(int argc, char** argv) {
 	}
 
 	oglWidget->changeImage(ldr_img, img_w, img_h);
-
-	window.resize(img_w, img_h);
 
 	return app.exec();
 }

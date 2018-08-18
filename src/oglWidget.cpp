@@ -16,7 +16,6 @@ void OGLWidget::changeImage(const std::vector<std::array<uint8_t, 4>>& img,
 
 
 void OGLWidget::initializeGL() {
-	std::cout << "Hello OpenGL!" << std::endl;
 	initializeOpenGLFunctions();
 	glClearColor(0.0f, 0.0f, 0.2f, 1.0f);
 	glEnable( GL_TEXTURE_2D );
