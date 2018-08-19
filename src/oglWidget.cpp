@@ -1,5 +1,20 @@
 #include "oglWidget.hpp"
 
+void tonemap(	const std::vector<Imf::Rgba>& hdrImg,
+				std::vector<std::array<uint8_t, 4>>& ldrImg,
+				const int w, const int h) {
+	for(auto j = 0; j < h; ++j) {
+		for(auto i = 0; i < w; ++i) {
+			const auto buf_idx = i + j*w;
+			ldrImg[buf_idx][1] = (uint8_t)(255*std::min(hdrImg[buf_idx].g, (half)1.0f));
+			ldrImg[buf_idx][0] = (uint8_t)(255*std::min(hdrImg[buf_idx].r, (half)1.0f));
+			ldrImg[buf_idx][2] = (uint8_t)(255*std::min(hdrImg[buf_idx].b, (half)1.0f));
+			ldrImg[buf_idx][3] = (uint8_t)(255*std::min(hdrImg[buf_idx].a, (half)1.0f));
+		}
+	}
+}
+
+
 OGLWidget::OGLWidget(QLabel& pixelPositionLabel) :	QOpenGLWidget{},
 													cameraPanX{0},
 													cameraPanY{0},
@@ -7,15 +22,16 @@ OGLWidget::OGLWidget(QLabel& pixelPositionLabel) :	QOpenGLWidget{},
 													mousePressed{false},
 													pixelPositionLabel{pixelPositionLabel} {};
 
-void OGLWidget::changeImage(std::vector<Imf::Rgba>* hdrImg,
-							const std::vector<std::array<uint8_t, 4>>& ldrImg, 
+void OGLWidget::changeImage(const std::vector<Imf::Rgba>& img,
 							const int w, const int h) {
 	imageWidth = w;
 	imageHeight = h;
+	hdrImage = img;
+
+	std::vector<std::array<uint8_t, 4>> ldrImg{(size_t)w*h};
+	tonemap(img, ldrImg, w, h);
 	glBindTexture(GL_TEXTURE_2D, textureId);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, ldrImg.data());
-
-	hdrImage = hdrImg;
 }
 
 
@@ -95,7 +111,7 @@ void OGLWidget::mouseMoveEvent(QMouseEvent* event) {
 	if (x < 0 || y < 0 || x >= imageWidth || y >= imageHeight) {
 		pixelPositionLabel.setText("Cursor not on image");	
 	} else {
-		const auto pix = (*hdrImage)[x + y*imageWidth];
+		const auto pix = hdrImage[x + y*imageWidth];
 
 		std::stringstream stream;
 		stream << std::fixed << std::setprecision(4);

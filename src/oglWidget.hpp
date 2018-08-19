@@ -19,8 +19,7 @@ class OGLWidget : public QOpenGLWidget, protected QOpenGLFunctions {
 public:
 	OGLWidget(QLabel& pixelPositionLabel);
 
-	void changeImage(	std::vector<Imf::Rgba>* inputHdrImage,
-						const std::vector<std::array<uint8_t, 4>>& inputLdrImage,
+	void changeImage(	const std::vector<Imf::Rgba>& inputHdrImage,
 						const int imageWidth, const int imageHeight);
 
 protected:
@@ -34,7 +33,7 @@ protected:
 	void wheelEvent(QWheelEvent *event);
 
 private:
-	std::vector<Imf::Rgba>* hdrImage;
+	std::vector<Imf::Rgba> hdrImage;
 
 	int		widgetWidth,	widgetHeight;
 	int		imageWidth,		imageHeight;
