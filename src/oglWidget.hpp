@@ -17,7 +17,7 @@
 
 class OGLWidget : public QOpenGLWidget, protected QOpenGLFunctions {
 public:
-	OGLWidget(QLabel& pixelInfoLabel);
+	OGLWidget(QLabel& pixelInfoLabel, QPushButton& zoomButton);
 
 	void changeImage(	const std::vector<Imf::Rgba>& inputHdrImage,
 						const int imageWidth, const int imageHeight);
@@ -48,6 +48,7 @@ private:
 	bool mousePressed;
 
 	QLabel& pixelInfoLabel;
+	QPushButton& zoomButton;
 };
 
 #endif

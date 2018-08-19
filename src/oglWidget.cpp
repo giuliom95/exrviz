@@ -33,12 +33,14 @@ void tonemap(	const std::vector<Imf::Rgba>& hdrImg,
 	}
 }
 
-OGLWidget::OGLWidget(QLabel& pixelInfoLabel) :	QOpenGLWidget{},
+OGLWidget::OGLWidget(	QLabel& pixelInfoLabel,
+						QPushButton& zoomButton) :	QOpenGLWidget{},
 													cameraPanX{0},
 													cameraPanY{0},
 													zoomFactor{1},
 													mousePressed{false},
-													pixelInfoLabel{pixelInfoLabel} {};
+													pixelInfoLabel{pixelInfoLabel},
+													zoomButton{zoomButton} {};
 
 void OGLWidget::changeImage(const std::vector<Imf::Rgba>& img,
 							const int w, const int h) {
@@ -50,6 +52,10 @@ void OGLWidget::changeImage(const std::vector<Imf::Rgba>& img,
 	tonemap(img, ldrImg, w, h);
 	glBindTexture(GL_TEXTURE_2D, textureId);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, ldrImg.data());
+}
+
+void OGLWidget::zoomButtonClicked() {
+	std::cout << "SCIAO BELO" << std::endl;
 }
 
 
@@ -153,6 +159,11 @@ void OGLWidget::wheelEvent(QWheelEvent *event) {
 
 	cameraPanX -= mousePos.x() / zoomFactor;
 	cameraPanY -= mousePos.y() / zoomFactor;
+
+	std::stringstream stream;
+	stream << std::fixed << std::setprecision(1);
+	stream << (100 * zoomFactor) << "%";
+	zoomButton.setText(stream.str().c_str());
 
 	update();
 }

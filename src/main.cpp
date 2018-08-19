@@ -35,11 +35,14 @@ int main(int argc, char** argv) {
 	QWidget* bottomBarLayoutContainer = new QWidget;	// This is used to give a fixed height to the layout
 	bottomBarLayoutContainer->setFixedHeight(30);
 	QHBoxLayout* bottomBarLayout = new QHBoxLayout;
+	QPushButton* zoomButton = new QPushButton("100.0%");
+	zoomButton->setFixedWidth(70);
 	QLabel* pixelInfoLabel = new QLabel("Cursor not on image");
+	bottomBarLayout->addWidget(zoomButton);
 	bottomBarLayout->addWidget(pixelInfoLabel);
 	bottomBarLayoutContainer->setLayout(bottomBarLayout);
 
-	OGLWidget* oglWidget = new OGLWidget(*pixelInfoLabel);
+	OGLWidget* oglWidget = new OGLWidget(*pixelInfoLabel, *zoomButton);
 	oglWidget->setMouseTracking(true);
 
 	mainLayout->addWidget(oglWidget);
