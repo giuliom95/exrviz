@@ -3,3 +3,4 @@
 bin/
 .qmake*
 Makefile
+.vscode
