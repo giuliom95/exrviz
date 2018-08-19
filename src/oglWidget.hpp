@@ -12,11 +12,16 @@
 
 #include <QtWidgets>
 
+#include <ImfRgbaFile.h>
+#include <ImfRgba.h>
+
 class OGLWidget : public QOpenGLWidget, protected QOpenGLFunctions {
 public:
 	OGLWidget(QLabel& pixelPositionLabel);
 
-	void changeImage(const std::vector<std::array<uint8_t, 4>>& inputImage, const int imageWidth, const int imageHeight);
+	void changeImage(	std::vector<Imf::Rgba>* inputHdrImage,
+						const std::vector<std::array<uint8_t, 4>>& inputLdrImage,
+						const int imageWidth, const int imageHeight);
 
 protected:
 	void initializeGL();
@@ -29,6 +34,8 @@ protected:
 	void wheelEvent(QWheelEvent *event);
 
 private:
+	std::vector<Imf::Rgba>* hdrImage;
+
 	int		widgetWidth,	widgetHeight;
 	int		imageWidth,		imageHeight;
 	float	cameraPanX,		cameraPanY;

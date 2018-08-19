@@ -7,12 +7,15 @@ OGLWidget::OGLWidget(QLabel& pixelPositionLabel) :	QOpenGLWidget{},
 													mousePressed{false},
 													pixelPositionLabel{pixelPositionLabel} {};
 
-void OGLWidget::changeImage(const std::vector<std::array<uint8_t, 4>>& img, 
+void OGLWidget::changeImage(std::vector<Imf::Rgba>* hdrImg,
+							const std::vector<std::array<uint8_t, 4>>& ldrImg, 
 							const int w, const int h) {
 	imageWidth = w;
 	imageHeight = h;
 	glBindTexture(GL_TEXTURE_2D, textureId);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, img.data());
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, ldrImg.data());
+
+	hdrImage = hdrImg;
 }
 
 
@@ -26,9 +29,6 @@ void OGLWidget::initializeGL() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	// Just a placeholder
-	const std::vector<std::array<uint8_t, 4>> img{256*256, {255,0,255,255}};
-	changeImage(img, 256, 256);
 }
 
 void OGLWidget::resizeGL(int w, int h) {
@@ -92,10 +92,18 @@ void OGLWidget::mouseMoveEvent(QMouseEvent* event) {
 	const int x = invZoom*mousePos.x() + cameraPanX;
 	const int y = invZoom*mousePos.y() + cameraPanY;
 
-	std::stringstream stream;
-	stream << std::fixed << std::setprecision(2) << "x: " << x << "    y: " << y;
-	
-	pixelPositionLabel.setText(stream.str().c_str());
+	if (x < 0 || y < 0 || x >= imageWidth || y >= imageHeight) {
+		pixelPositionLabel.setText("Cursor not on image");	
+	} else {
+		const auto pix = (*hdrImage)[x + y*imageWidth];
+
+		std::stringstream stream;
+		stream << std::fixed << std::setprecision(4);
+		stream << "x: " << x << "    y: " << y;
+		stream << "    r: " << pix.r << "    g: " << pix.g << "    b: " << pix.b << "    a: " << pix.a;
+		
+		pixelPositionLabel.setText(stream.str().c_str());
+	}
 }
 
 void OGLWidget::wheelEvent(QWheelEvent *event) {
