@@ -32,18 +32,18 @@ int main(int argc, char** argv) {
 	QVBoxLayout* mainLayout = new QVBoxLayout;
 	mainLayout->setContentsMargins(0,0,0,0);
 
-	QWidget* pixelInfoLayoutContainer = new QWidget;	// This is used to give a fixed height to the layout
-	pixelInfoLayoutContainer->setFixedHeight(30);
-	QHBoxLayout* pixelInfoLayout = new QHBoxLayout;
+	QWidget* bottomBarLayoutContainer = new QWidget;	// This is used to give a fixed height to the layout
+	bottomBarLayoutContainer->setFixedHeight(30);
+	QHBoxLayout* bottomBarLayout = new QHBoxLayout;
 	QLabel* pixelInfoLabel = new QLabel("Cursor not on image");
-	pixelInfoLayout->addWidget(pixelInfoLabel);
-	pixelInfoLayoutContainer->setLayout(pixelInfoLayout);
+	bottomBarLayout->addWidget(pixelInfoLabel);
+	bottomBarLayoutContainer->setLayout(bottomBarLayout);
 
 	OGLWidget* oglWidget = new OGLWidget(*pixelInfoLabel);
 	oglWidget->setMouseTracking(true);
 
 	mainLayout->addWidget(oglWidget);
-	mainLayout->addWidget(pixelInfoLayoutContainer);
+	mainLayout->addWidget(bottomBarLayoutContainer);
 	window.setLayout(mainLayout);
 	window.show();
 
