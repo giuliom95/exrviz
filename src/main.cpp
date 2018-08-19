@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
 	mainLayout->setContentsMargins(0,0,0,0);
 
 	QWidget* pixelInfoLayoutContainer = new QWidget;	// This is used to give a fixed height to the layout
-	pixelInfoLayoutContainer->setFixedHeight(40);
+	pixelInfoLayoutContainer->setFixedHeight(30);
 	QHBoxLayout* pixelInfoLayout = new QHBoxLayout;
 	QLabel* pixelPositionLabel = new QLabel("Cursor not on image");
 	pixelInfoLayout->addWidget(pixelPositionLabel);

@@ -99,7 +99,7 @@ void OGLWidget::mouseMoveEvent(QMouseEvent* event) {
 
 		std::stringstream stream;
 		stream << std::fixed << std::setprecision(4);
-		stream << "x: " << x << "    y: " << y;
+		stream << "x: " << x << "\ty: " << y << "\t";
 		stream << "    r: " << pix.r << "    g: " << pix.g << "    b: " << pix.b << "    a: " << pix.a;
 		
 		pixelPositionLabel.setText(stream.str().c_str());
