@@ -1,19 +1,19 @@
 #include "oglWidget.hpp"
 
 void tonemap(	const std::vector<Imf::Rgba>& hdrImg,
-				std::vector<std::array<uint8_t, 4>>& ldrImg,
+				std::vector<std::array<uint8_t, 3>>& ldrImg,
 				const int w, const int h) {
+
 	for(auto j = 0; j < h; ++j) {
 		for(auto i = 0; i < w; ++i) {
-			const auto buf_idx = i + j*w;
-			ldrImg[buf_idx][1] = (uint8_t)(255*std::min(hdrImg[buf_idx].g, (half)1.0f));
-			ldrImg[buf_idx][0] = (uint8_t)(255*std::min(hdrImg[buf_idx].r, (half)1.0f));
-			ldrImg[buf_idx][2] = (uint8_t)(255*std::min(hdrImg[buf_idx].b, (half)1.0f));
-			ldrImg[buf_idx][3] = (uint8_t)(255*std::min(hdrImg[buf_idx].a, (half)1.0f));
+			auto& ldrPix = ldrImg[i + j*w];
+			const auto& hdrPix = hdrImg[i + j*w];
+			ldrPix[1] = (uint8_t)(255*std::min(hdrPix.g, (half)1.0f));
+			ldrPix[0] = (uint8_t)(255*std::min(hdrPix.r, (half)1.0f));
+			ldrPix[2] = (uint8_t)(255*std::min(hdrPix.b, (half)1.0f));
 		}
 	}
 }
-
 
 OGLWidget::OGLWidget(QLabel& pixelPositionLabel) :	QOpenGLWidget{},
 													cameraPanX{0},
@@ -28,10 +28,10 @@ void OGLWidget::changeImage(const std::vector<Imf::Rgba>& img,
 	imageHeight = h;
 	hdrImage = img;
 
-	std::vector<std::array<uint8_t, 4>> ldrImg{(size_t)w*h};
+	std::vector<std::array<uint8_t, 3>> ldrImg{(size_t)w*h};
 	tonemap(img, ldrImg, w, h);
 	glBindTexture(GL_TEXTURE_2D, textureId);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, ldrImg.data());
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, ldrImg.data());
 }
 
 
