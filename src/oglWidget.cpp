@@ -1,16 +1,34 @@
 #include "oglWidget.hpp"
 
+float clamp(float v, float lo, float hi) {
+	if(v < lo)
+		return lo;
+	if(v > hi)
+		return hi;
+	return v;
+}
+
+/*
+ *	This tonemapping function is almost the one decribed here:
+ *	http://www.openexr.com/using.html
+ *	(The knee function has been ignored for now)
+ */
 void tonemap(	const std::vector<Imf::Rgba>& hdrImg,
 				std::vector<std::array<uint8_t, 3>>& ldrImg,
 				const int w, const int h) {
+
+	const auto exposure = 0.0f;
+	const auto a = std::pow(2, exposure + 2.47393f);
+	const auto b = 84.66f;
+	const auto invGamma = 1 / 2.2f;
 
 	for(auto j = 0; j < h; ++j) {
 		for(auto i = 0; i < w; ++i) {
 			auto& ldrPix = ldrImg[i + j*w];
 			const auto& hdrPix = hdrImg[i + j*w];
-			ldrPix[1] = (uint8_t)(255*std::min(hdrPix.g, (half)1.0f));
-			ldrPix[0] = (uint8_t)(255*std::min(hdrPix.r, (half)1.0f));
-			ldrPix[2] = (uint8_t)(255*std::min(hdrPix.b, (half)1.0f));
+			ldrPix[1] = (uint8_t)(clamp(b*std::pow(a*hdrPix.r, invGamma), 0, 255));
+			ldrPix[0] = (uint8_t)(clamp(b*std::pow(a*hdrPix.g, invGamma), 0, 255));
+			ldrPix[2] = (uint8_t)(clamp(b*std::pow(a*hdrPix.b, invGamma), 0, 255));
 		}
 	}
 }
