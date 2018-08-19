@@ -1,10 +1,11 @@
 #include "oglWidget.hpp"
 
-OGLWidget::OGLWidget() :	QOpenGLWidget{},
-							cameraPanX{0},
-							cameraPanY{0},
-							zoomFactor{1},
-							mousePressed{false} {};
+OGLWidget::OGLWidget(QLabel& pixelPositionLabel) :	QOpenGLWidget{},
+													cameraPanX{0},
+													cameraPanY{0},
+													zoomFactor{1},
+													mousePressed{false},
+													pixelPositionLabel{pixelPositionLabel} {};
 
 void OGLWidget::changeImage(const std::vector<std::array<uint8_t, 4>>& img, 
 							const int w, const int h) {
@@ -72,13 +73,13 @@ void OGLWidget::mouseReleaseEvent(QMouseEvent* event) {
 }
 
 void OGLWidget::mouseMoveEvent(QMouseEvent* event) {
+	const auto invZoom = 1 / zoomFactor;
+
 	if(mousePressed) {
 		const auto mousePos = event->screenPos();
 		const int curMouseX = mousePos.x();
 		const int curMouseY = mousePos.y(); 
 
-		// Movement speed must be inversely proportional to zoom factor
-		const auto invZoom = 1 / zoomFactor;
 		cameraPanX -= invZoom*(curMouseX - lastMouseX);
 		cameraPanY -= invZoom*(curMouseY - lastMouseY);
 		lastMouseX = curMouseX;
@@ -86,6 +87,15 @@ void OGLWidget::mouseMoveEvent(QMouseEvent* event) {
 
 		update();
 	}
+
+	const auto mousePos = event->pos();
+	const int x = invZoom*mousePos.x() + cameraPanX;
+	const int y = invZoom*mousePos.y() + cameraPanY;
+
+	std::stringstream stream;
+	stream << std::fixed << std::setprecision(2) << "x: " << x << "    y: " << y;
+	
+	pixelPositionLabel.setText(stream.str().c_str());
 }
 
 void OGLWidget::wheelEvent(QWheelEvent *event) {

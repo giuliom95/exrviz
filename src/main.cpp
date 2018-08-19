@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
 	pixelInfoLayout->addWidget(pixelPositionLabel);
 	pixelInfoLayoutContainer->setLayout(pixelInfoLayout);
 
-	OGLWidget* oglWidget = new OGLWidget;
+	OGLWidget* oglWidget = new OGLWidget(*pixelPositionLabel);
 	oglWidget->setMouseTracking(true);
 
 	mainLayout->addWidget(oglWidget);

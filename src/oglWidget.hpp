@@ -6,12 +6,15 @@
 #include <array>
 #include <cmath>
 #include <cstdint>
+#include <string>
+#include <iomanip>
+#include <sstream>
 
 #include <QtWidgets>
 
 class OGLWidget : public QOpenGLWidget, protected QOpenGLFunctions {
 public:
-	OGLWidget();
+	OGLWidget(QLabel& pixelPositionLabel);
 
 	void changeImage(const std::vector<std::array<uint8_t, 4>>& inputImage, const int imageWidth, const int imageHeight);
 
@@ -37,6 +40,8 @@ private:
 	GLuint textureId;
 
 	bool mousePressed;
+
+	QLabel& pixelPositionLabel;
 };
 
 #endif
