@@ -33,12 +33,12 @@ void tonemap(	const std::vector<Imf::Rgba>& hdrImg,
 	}
 }
 
-OGLWidget::OGLWidget(QLabel& pixelPositionLabel) :	QOpenGLWidget{},
+OGLWidget::OGLWidget(QLabel& pixelInfoLabel) :	QOpenGLWidget{},
 													cameraPanX{0},
 													cameraPanY{0},
 													zoomFactor{1},
 													mousePressed{false},
-													pixelPositionLabel{pixelPositionLabel} {};
+													pixelInfoLabel{pixelInfoLabel} {};
 
 void OGLWidget::changeImage(const std::vector<Imf::Rgba>& img,
 							const int w, const int h) {
@@ -127,7 +127,7 @@ void OGLWidget::mouseMoveEvent(QMouseEvent* event) {
 	const int y = invZoom*mousePos.y() + cameraPanY;
 
 	if (x < 0 || y < 0 || x >= imageWidth || y >= imageHeight) {
-		pixelPositionLabel.setText("Cursor not on image");	
+		pixelInfoLabel.setText("Cursor not on image");	
 	} else {
 		const auto pix = hdrImage[x + y*imageWidth];
 
@@ -136,7 +136,7 @@ void OGLWidget::mouseMoveEvent(QMouseEvent* event) {
 		stream << "x: " << x << "\ty: " << y << "\t";
 		stream << "    r: " << pix.r << "    g: " << pix.g << "    b: " << pix.b << "    a: " << pix.a;
 		
-		pixelPositionLabel.setText(stream.str().c_str());
+		pixelInfoLabel.setText(stream.str().c_str());
 	}
 }
 
