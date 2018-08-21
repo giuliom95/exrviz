@@ -77,7 +77,7 @@ void OGLWidget::setZoom(float zf, float x, float y) {
 
 void OGLWidget::initializeGL() {
 	initializeOpenGLFunctions();
-	glClearColor(0.0f, 0.0f, 0.2f, 1.0f);
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glEnable( GL_TEXTURE_2D );
 
 	glGenTextures(1, &textureId);

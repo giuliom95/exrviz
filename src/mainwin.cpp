@@ -1,7 +1,7 @@
 #include "mainwin.hpp"
 
 ExrVizMainWindow::ExrVizMainWindow() : QWidget() {
-	resize(500, 500);
+	resize(600, 600);
 	setWindowTitle("exrviz");
 
 	QVBoxLayout* mainLayout = new QVBoxLayout;
