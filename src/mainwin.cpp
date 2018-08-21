@@ -28,5 +28,7 @@ ExrVizMainWindow::ExrVizMainWindow() : QWidget() {
 }
 
 void ExrVizMainWindow::handleZoomButton() {
-	std::cout << "PRESSED" << std::endl;
+	const auto cx = oglWidget->width() / 2;
+	const auto cy = oglWidget->height() / 2;
+	oglWidget->setZoom(1.0f, cx, cy);
 }

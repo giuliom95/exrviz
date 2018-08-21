@@ -70,6 +70,8 @@ void OGLWidget::setZoom(float zf, float x, float y) {
 	stream << std::fixed << std::setprecision(1);
 	stream << (100 * zoomFactor) << "%";
 	zoomButton.setText(stream.str().c_str());
+
+	update();
 }
 
 
@@ -166,5 +168,4 @@ void OGLWidget::wheelEvent(QWheelEvent *event) {
 	const auto newZoomFactor = zoomFactor + 0.5*scroll;
 
 	setZoom(newZoomFactor, mousePos.x(), mousePos.y());
-	update();
 }
