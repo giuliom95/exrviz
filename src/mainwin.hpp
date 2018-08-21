@@ -12,13 +12,17 @@
 
 
 class ExrVizMainWindow : public QWidget {
+	Q_OBJECT
 public:
-	ExrVizMainWindow();
+	explicit ExrVizMainWindow();
 	
 	void changeImage(	const std::vector<Imf::Rgba>& inputHdrImage,
 						const int imageWidth, const int imageHeight) {
 		oglWidget->changeImage(inputHdrImage, imageWidth, imageHeight);
 	}
+
+public slots:
+	void handleZoomButton();
 
 private:
 	QPushButton* zoomButton;

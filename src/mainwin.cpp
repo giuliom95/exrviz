@@ -23,4 +23,10 @@ ExrVizMainWindow::ExrVizMainWindow() : QWidget() {
 	mainLayout->addWidget(oglWidget);
 	mainLayout->addWidget(bottomBarLayoutContainer);
 	setLayout(mainLayout);
+
+	connect(zoomButton, SIGNAL (clicked()), this, SLOT (handleZoomButton()));
+}
+
+void ExrVizMainWindow::handleZoomButton() {
+	std::cout << "PRESSED" << std::endl;
 }

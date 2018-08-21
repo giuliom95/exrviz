@@ -16,6 +16,7 @@
 #include <ImfRgba.h>
 
 class OGLWidget : public QOpenGLWidget, protected QOpenGLFunctions {
+	Q_OBJECT
 public:
 	OGLWidget(QLabel& pixelInfoLabel, QPushButton& zoomButton);
 

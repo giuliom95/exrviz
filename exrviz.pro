@@ -1,3 +1,4 @@
+TEMPLATE = app
 TARGET = bin/exrviz
 HEADERS +=  src/mainwin.hpp     \
             src/oglWidget.hpp
