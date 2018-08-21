@@ -26,8 +26,8 @@ void tonemap(	const std::vector<Imf::Rgba>& hdrImg,
 		for(auto i = 0; i < w; ++i) {
 			auto& ldrPix = ldrImg[i + j*w];
 			const auto& hdrPix = hdrImg[i + j*w];
-			ldrPix[1] = (uint8_t)(clamp(b*std::pow(a*hdrPix.r, invGamma), 0, 255));
-			ldrPix[0] = (uint8_t)(clamp(b*std::pow(a*hdrPix.g, invGamma), 0, 255));
+			ldrPix[0] = (uint8_t)(clamp(b*std::pow(a*hdrPix.r, invGamma), 0, 255));
+			ldrPix[1] = (uint8_t)(clamp(b*std::pow(a*hdrPix.g, invGamma), 0, 255));
 			ldrPix[2] = (uint8_t)(clamp(b*std::pow(a*hdrPix.b, invGamma), 0, 255));
 		}
 	}
@@ -53,11 +53,6 @@ void OGLWidget::changeImage(const std::vector<Imf::Rgba>& img,
 	glBindTexture(GL_TEXTURE_2D, textureId);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, ldrImg.data());
 }
-
-void OGLWidget::zoomButtonClicked() {
-	std::cout << "SCIAO BELO" << std::endl;
-}
-
 
 void OGLWidget::initializeGL() {
 	initializeOpenGLFunctions();
