@@ -54,6 +54,25 @@ void OGLWidget::changeImage(const std::vector<Imf::Rgba>& img,
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, ldrImg.data());
 }
 
+
+void OGLWidget::setZoom(float zf, float x, float y) {
+	cameraPanX += x / zoomFactor;
+	cameraPanY += y / zoomFactor;
+
+	zoomFactor = zf;
+	zoomFactor = std::max(0.5f, zoomFactor);
+	zoomFactor = std::min(10.f, zoomFactor);
+
+	cameraPanX -= x / zoomFactor;
+	cameraPanY -= y / zoomFactor;
+
+	std::stringstream stream;
+	stream << std::fixed << std::setprecision(1);
+	stream << (100 * zoomFactor) << "%";
+	zoomButton.setText(stream.str().c_str());
+}
+
+
 void OGLWidget::initializeGL() {
 	initializeOpenGLFunctions();
 	glClearColor(0.0f, 0.0f, 0.2f, 1.0f);
@@ -144,21 +163,8 @@ void OGLWidget::mouseMoveEvent(QMouseEvent* event) {
 void OGLWidget::wheelEvent(QWheelEvent *event) {
 	const auto mousePos = event->pos();
 	const auto scroll = event->angleDelta().y() / 120.f;
-	
-	cameraPanX += mousePos.x() / zoomFactor;
-	cameraPanY += mousePos.y() / zoomFactor;
+	const auto newZoomFactor = zoomFactor + 0.5*scroll;
 
-	zoomFactor += 0.5*scroll;
-	zoomFactor = std::max(0.5f, zoomFactor);
-	zoomFactor = std::min(10.f, zoomFactor);
-
-	cameraPanX -= mousePos.x() / zoomFactor;
-	cameraPanY -= mousePos.y() / zoomFactor;
-
-	std::stringstream stream;
-	stream << std::fixed << std::setprecision(1);
-	stream << (100 * zoomFactor) << "%";
-	zoomButton.setText(stream.str().c_str());
-
+	setZoom(newZoomFactor, mousePos.x(), mousePos.y());
 	update();
 }

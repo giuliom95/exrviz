@@ -23,6 +23,8 @@ public:
 	void changeImage(	const std::vector<Imf::Rgba>& inputHdrImage,
 						const int imageWidth, const int imageHeight);
 
+	void setZoom(float zoomFactor, float centerX = 0.0f, float centerY = 0.0f);
+
 protected:
 	void initializeGL();
 	void resizeGL(int w, int h);
