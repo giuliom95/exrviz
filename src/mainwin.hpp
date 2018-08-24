@@ -26,6 +26,7 @@ public slots:
 
 private:
 	QPushButton* zoomButton;
+	QSlider* exposureSlider;
 	OGLWidget* oglWidget;
 };
 

@@ -7,6 +7,18 @@ ExrVizMainWindow::ExrVizMainWindow() : QWidget() {
 	QVBoxLayout* mainLayout = new QVBoxLayout;
 	mainLayout->setContentsMargins(0,0,0,0);
 
+	QWidget* topBarLayoutContainer = new QWidget;	// This is used to give a fixed height to the layout
+	topBarLayoutContainer->setFixedHeight(30);
+	QHBoxLayout* topBarLayout = new QHBoxLayout;
+	QLabel* exposureLabel = new QLabel("Exposure: ");
+	exposureSlider = new QSlider(Qt::Horizontal);
+	exposureSlider->setMinimum(-50);
+	exposureSlider->setMaximum(+50);
+	exposureSlider->setValue(0);
+	topBarLayout->addWidget(exposureLabel);
+	topBarLayout->addWidget(exposureSlider);
+	topBarLayoutContainer->setLayout(topBarLayout);
+
 	QWidget* bottomBarLayoutContainer = new QWidget;	// This is used to give a fixed height to the layout
 	bottomBarLayoutContainer->setFixedHeight(30);
 	QHBoxLayout* bottomBarLayout = new QHBoxLayout;
@@ -20,6 +32,7 @@ ExrVizMainWindow::ExrVizMainWindow() : QWidget() {
 	oglWidget = new OGLWidget(*pixelInfoLabel, *zoomButton);
 	oglWidget->setMouseTracking(true);
 
+	mainLayout->addWidget(topBarLayoutContainer);
 	mainLayout->addWidget(oglWidget);
 	mainLayout->addWidget(bottomBarLayoutContainer);
 	setLayout(mainLayout);
