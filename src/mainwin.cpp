@@ -48,5 +48,5 @@ void ExrVizMainWindow::handleZoomButton() {
 }
 
 void ExrVizMainWindow::handleExposureChange(int value) {
-	std::cout << value << std::endl;
+	oglWidget->changeExposure(value / 10.0f);
 }

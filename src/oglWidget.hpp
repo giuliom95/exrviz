@@ -23,6 +23,8 @@ public:
 	void changeImage(	const std::vector<Imf::Rgba>& inputHdrImage,
 						const int imageWidth, const int imageHeight);
 
+	void changeExposure(float exposure);
+
 	void setZoom(float zoomFactor, float centerX, float centerY);
 
 protected:
@@ -36,12 +38,16 @@ protected:
 	void wheelEvent(QWheelEvent *event);
 
 private:
+	void updateImage();
+
 	std::vector<Imf::Rgba> hdrImage;
 
 	int		widgetWidth,	widgetHeight;
 	int		imageWidth,		imageHeight;
 	float	cameraPanX,		cameraPanY;
 	float	lastMouseX,		lastMouseY;
+
+	float exposure;
 
 	float zoomFactor;
 	float widgetAspectRatio;

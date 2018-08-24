@@ -15,10 +15,10 @@ float clamp(float v, float lo, float hi) {
  */
 void tonemap(	const std::vector<Imf::Rgba>& hdrImg,
 				std::vector<std::array<uint8_t, 3>>& ldrImg,
-				const int w, const int h) {
+				const int w, const int h,
+				const float exp = 0.0f) {
 
-	const auto exposure = 0.0f;
-	const auto a = std::pow(2, exposure + 2.47393f);
+	const auto a = std::pow(2, exp + 2.47393f);
 	const auto b = 84.66f;
 	const auto invGamma = 1 / 2.2f;
 
@@ -37,6 +37,7 @@ OGLWidget::OGLWidget(	QLabel& pixelInfoLabel,
 						QPushButton& zoomButton) :	QOpenGLWidget{},
 													cameraPanX{0},
 													cameraPanY{0},
+													exposure{0.0f},
 													zoomFactor{1},
 													mousePressed{false},
 													pixelInfoLabel{pixelInfoLabel},
@@ -47,11 +48,13 @@ void OGLWidget::changeImage(const std::vector<Imf::Rgba>& img,
 	imageWidth = w;
 	imageHeight = h;
 	hdrImage = img;
+	updateImage();
+}
 
-	std::vector<std::array<uint8_t, 3>> ldrImg{(size_t)w*h};
-	tonemap(img, ldrImg, w, h);
-	glBindTexture(GL_TEXTURE_2D, textureId);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, ldrImg.data());
+
+void OGLWidget::changeExposure(float e) {
+	exposure = e;
+	updateImage();
 }
 
 
@@ -168,4 +171,12 @@ void OGLWidget::wheelEvent(QWheelEvent *event) {
 	const auto newZoomFactor = zoomFactor + 0.5*scroll;
 
 	setZoom(newZoomFactor, mousePos.x(), mousePos.y());
+}
+
+void OGLWidget::updateImage() {
+	std::vector<std::array<uint8_t, 3>> ldrImg{(size_t)imageWidth*imageHeight};
+	tonemap(hdrImage, ldrImg, imageWidth, imageHeight, exposure);
+	glBindTexture(GL_TEXTURE_2D, textureId);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageWidth, imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, ldrImg.data());
+	update();
 }
