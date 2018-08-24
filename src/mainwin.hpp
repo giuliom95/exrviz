@@ -23,6 +23,7 @@ public:
 
 public slots:
 	void handleZoomButton();
+	void handleExposureChange(int);
 
 private:
 	QPushButton* zoomButton;

@@ -37,11 +37,16 @@ ExrVizMainWindow::ExrVizMainWindow() : QWidget() {
 	mainLayout->addWidget(bottomBarLayoutContainer);
 	setLayout(mainLayout);
 
-	connect(zoomButton, SIGNAL (clicked()), this, SLOT (handleZoomButton()));
+	connect(zoomButton,		SIGNAL (clicked()),			this, SLOT (handleZoomButton()));
+	connect(exposureSlider,	SIGNAL (valueChanged(int)),	this, SLOT (handleExposureChange(int)));
 }
 
 void ExrVizMainWindow::handleZoomButton() {
 	const auto cx = oglWidget->width() / 2;
 	const auto cy = oglWidget->height() / 2;
 	oglWidget->setZoom(1.0f, cx, cy);
+}
+
+void ExrVizMainWindow::handleExposureChange(int value) {
+	std::cout << value << std::endl;
 }
