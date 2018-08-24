@@ -9,6 +9,7 @@
 #include <string>
 #include <iomanip>
 #include <sstream>
+#include <thread>
 
 #include <QtWidgets>
 

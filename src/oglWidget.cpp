@@ -13,7 +13,7 @@ float clamp(float v, float lo, float hi) {
  *	http://www.openexr.com/using.html
  *	(The knee function has been ignored for now)
  */
-void tonemap(	const std::vector<Imf::Rgba>& hdrImg,
+void tonemap(const std::vector<Imf::Rgba>& hdrImg,
 				std::vector<std::array<uint8_t, 3>>& ldrImg,
 				const int w, const int h,
 				const float exp = 0.0f) {
@@ -22,15 +22,22 @@ void tonemap(	const std::vector<Imf::Rgba>& hdrImg,
 	const auto b = 84.66f;
 	const auto invGamma = 1 / 2.2f;
 
-	for(auto j = 0; j < h; ++j) {
-		for(auto i = 0; i < w; ++i) {
-			auto& ldrPix = ldrImg[i + j*w];
-			const auto& hdrPix = hdrImg[i + j*w];
-			ldrPix[0] = (uint8_t)(clamp(b*std::pow(a*hdrPix.r, invGamma), 0, 255));
-			ldrPix[1] = (uint8_t)(clamp(b*std::pow(a*hdrPix.g, invGamma), 0, 255));
-			ldrPix[2] = (uint8_t)(clamp(b*std::pow(a*hdrPix.b, invGamma), 0, 255));
-		}
+	const auto nthreads = std::thread::hardware_concurrency();
+	auto threads = std::vector<std::thread>();
+	for (unsigned tid = 0; tid < nthreads; tid++) {
+		threads.push_back(std::thread([=, &hdrImg, &ldrImg]() {
+			for (signed j = tid; j < h; j += nthreads) {
+				for (auto i = 0; i < w; i++) {
+					auto& ldrPix = ldrImg[i + j*w];
+					const auto& hdrPix = hdrImg[i + j*w];
+					ldrPix[0] = (uint8_t)(clamp(b*std::pow(a*hdrPix.r, invGamma), 0, 255));
+					ldrPix[1] = (uint8_t)(clamp(b*std::pow(a*hdrPix.g, invGamma), 0, 255));
+					ldrPix[2] = (uint8_t)(clamp(b*std::pow(a*hdrPix.b, invGamma), 0, 255));
+				}
+			}
+		}));
 	}
+	for (auto& thread : threads) thread.join();
 }
 
 OGLWidget::OGLWidget(	QLabel& pixelInfoLabel,
