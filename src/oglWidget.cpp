@@ -65,8 +65,8 @@ void OGLWidget::changeImage(const std::vector<Imf::Rgba>& img,
 	const GLfloat vtxBufData[] = {
 		0.0f, 0.0f, 0.0f,
 		   w, 0.0f, 0.0f,
-		   w,    h, 0.0f,
-		0.0f,    h, 0.0f
+		0.0f,    h, 0.0f,
+		   w,    h, 0.0f
 	};
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vtxBufData), vtxBufData, GL_STATIC_DRAW);
 
@@ -217,7 +217,7 @@ void OGLWidget::paintGL() {
 		(void*)NULL	// array buffer offset
 	);
 	// Draw the triangle !
-	glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Starting from vertex 0; 3 vertices total -> 1 triangle
 	glDisableVertexAttribArray(0);
 }
 
