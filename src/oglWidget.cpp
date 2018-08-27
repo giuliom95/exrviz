@@ -48,7 +48,13 @@ OGLWidget::OGLWidget(	QLabel& pixelInfoLabel,
 													zoomFactor{1},
 													mousePressed{false},
 													pixelInfoLabel{pixelInfoLabel},
-													zoomButton{zoomButton} {};
+													zoomButton{zoomButton},
+													vao{} {
+	QSurfaceFormat format;
+	format.setProfile(QSurfaceFormat::CoreProfile);
+	format.setVersion(4,1);
+	setFormat(format);
+};
 
 void OGLWidget::changeImage(const std::vector<Imf::Rgba>& img,
 							const int w, const int h) {
@@ -88,13 +94,81 @@ void OGLWidget::setZoom(float zf, float x, float y) {
 void OGLWidget::initializeGL() {
 	initializeOpenGLFunctions();
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	glEnable( GL_TEXTURE_2D );
+	glEnable(GL_TEXTURE_2D);
+	
+	vao.create();
+	vao.bind();
+
+	// Generate 1 buffer, put the resulting identifier in vertexbuffer
+	glGenBuffers(1, &vtxBuf);
+	// The following commands will talk about our 'vtxBuf' buffer
+	glBindBuffer(GL_ARRAY_BUFFER, vtxBuf);
 
 	glGenTextures(1, &textureId);
 	glBindTexture(GL_TEXTURE_2D, textureId);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
+	// Create shaders
+	const auto vtxShaderId = glCreateShader(GL_VERTEX_SHADER);
+	const auto fragShaderId = glCreateShader(GL_FRAGMENT_SHADER);
+
+
+	GLint result = GL_FALSE;
+	int infoLogLen;
+
+	// Compile Vertex Shader
+	const std::string vtxShaderCode = "#version 330 core\nlayout(location = 0) in vec3 vertexPosition_modelspace;\nvoid main(){\ngl_Position.xyz = vertexPosition_modelspace;\ngl_Position.w = 1.0;\n}";
+	const auto* vtxShaderCodePtr = vtxShaderCode.c_str();
+	glShaderSource(vtxShaderId, 1, &vtxShaderCodePtr, NULL);
+	glCompileShader(vtxShaderId);
+
+	// Check Vertex Shader
+	glGetShaderiv(vtxShaderId, GL_COMPILE_STATUS, &result);
+	glGetShaderiv(vtxShaderId, GL_INFO_LOG_LENGTH, &infoLogLen);
+	if ( infoLogLen > 0 ){
+		std::vector<char> msg(infoLogLen+1);
+		glGetShaderInfoLog(vtxShaderId, infoLogLen, NULL, msg.data());
+		std::cout << std::string(msg.data()) << std::endl;
+	}
+
+	// Compile Frag Shader
+	const std::string fragShaderCode = "#version 330 core\nout vec3 color;\nvoid main(){\ncolor = vec3(1,0,0);\n}";
+	const auto* fragShaderCodePtr = fragShaderCode.c_str();
+	glShaderSource(fragShaderId, 1, &fragShaderCodePtr, NULL);
+	glCompileShader(fragShaderId);
+
+	// Check Frag Shader
+	glGetShaderiv(fragShaderId, GL_COMPILE_STATUS, &result);
+	glGetShaderiv(fragShaderId, GL_INFO_LOG_LENGTH, &infoLogLen);
+	if ( infoLogLen > 0 ){
+		std::vector<char> msg(infoLogLen+1);
+		glGetShaderInfoLog(fragShaderId, infoLogLen, NULL, msg.data());
+		std::cout << std::string(msg.data()) << std::endl;
+	}
+
+	// Link the program
+	GLuint progId = glCreateProgram();
+	glAttachShader(progId, vtxShaderId);
+	glAttachShader(progId, fragShaderId);
+	glLinkProgram(progId);
+
+	// Check the program
+	glGetProgramiv(progId, GL_LINK_STATUS, &result);
+	glGetProgramiv(progId, GL_INFO_LOG_LENGTH, &infoLogLen);
+	if ( infoLogLen > 0 ){
+		std::vector<char> msg(infoLogLen+1);
+		glGetProgramInfoLog(progId, infoLogLen, NULL, msg.data());
+		std::cout << std::string(msg.data()) << std::endl;
+	}
+	
+	glDetachShader(progId, vtxShaderId);
+	glDetachShader(progId, fragShaderId);
+	
+	glDeleteShader(vtxShaderId);
+	glDeleteShader(fragShaderId);
+
+	glUseProgram(progId);
 }
 
 void OGLWidget::resizeGL(int w, int h) {
@@ -116,14 +190,37 @@ void OGLWidget::paintGL() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
+	// glBindTexture(GL_TEXTURE_2D, textureId);
+	// glBegin(GL_QUADS); 
+	// 	glTexCoord2f(0.f, 0.f); glVertex2f(0, 0);
+	// 	glTexCoord2f(1.f, 0.f); glVertex2f(imageWidth, 0);
+	// 	glTexCoord2f(1.f, 1.f); glVertex2f(imageWidth, imageHeight);
+	// 	glTexCoord2f(0.f, 1.f); glVertex2f(0, imageHeight);
+	// glEnd();
+
 	glClear(GL_COLOR_BUFFER_BIT);
-	glBindTexture(GL_TEXTURE_2D, textureId);
-	glBegin(GL_QUADS); 
-		glTexCoord2f(0.f, 0.f); glVertex2f(0, 0);
-		glTexCoord2f(1.f, 0.f); glVertex2f(imageWidth, 0);
-		glTexCoord2f(1.f, 1.f); glVertex2f(imageWidth, imageHeight);
-		glTexCoord2f(0.f, 1.f); glVertex2f(0, imageHeight);
-	glEnd();
+
+	const GLfloat vtxBufData[] = {
+		      0.0f,        0.0f, 0.0f,
+		imageWidth,        0.0f, 0.0f,
+		imageWidth,	imageHeight, 0.0f,
+		      0.0f,	imageHeight, 0.0f
+	};
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vtxBufData), vtxBufData, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vtxBuf);
+	glVertexAttribPointer(
+		0,			// attribute 0. No particular reason for 0, but must match the layout in the shader.
+		3,			// size
+		GL_FLOAT,	// type
+		GL_FALSE,	// normalized?
+		0,			// stride
+		(void*)NULL	// array buffer offset
+	);
+	// Draw the triangle !
+	glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
+	glDisableVertexAttribArray(0);
 }
 
 void OGLWidget::mousePressEvent(QMouseEvent* event) {
@@ -181,9 +278,14 @@ void OGLWidget::wheelEvent(QWheelEvent *event) {
 }
 
 void OGLWidget::updateImage() {
-	std::vector<std::array<uint8_t, 3>> ldrImg{(size_t)imageWidth*imageHeight};
-	tonemap(hdrImage, ldrImg, imageWidth, imageHeight, exposure);
+	
+	std::vector<std::array<float, 3>> data{(size_t)imageWidth*imageHeight};
+	for(auto i = 0; i < imageWidth*imageHeight; ++i) {
+		data[i][0] = (float)hdrImage[i].r;
+		data[i][1] = (float)hdrImage[i].g;
+		data[i][2] = (float)hdrImage[i].b;
+	}
 	glBindTexture(GL_TEXTURE_2D, textureId);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageWidth, imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, ldrImg.data());
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageWidth, imageHeight, 0, GL_RGB, GL_FLOAT, data.data());
 	update();
 }
