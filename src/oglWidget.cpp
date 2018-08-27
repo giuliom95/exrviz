@@ -61,6 +61,15 @@ void OGLWidget::changeImage(const std::vector<Imf::Rgba>& img,
 	imageWidth = w;
 	imageHeight = h;
 	hdrImage = img;
+
+	const GLfloat vtxBufData[] = {
+		0.0f, 0.0f, 0.0f,
+		   w, 0.0f, 0.0f,
+		   w,    h, 0.0f,
+		0.0f,    h, 0.0f
+	};
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vtxBufData), vtxBufData, GL_STATIC_DRAW);
+
 	updateImage();
 }
 
@@ -118,7 +127,7 @@ void OGLWidget::initializeGL() {
 	int infoLogLen;
 
 	// Compile Vertex Shader
-	const std::string vtxShaderCode = "#version 330 core\nlayout(location = 0) in vec3 vertexPosition_modelspace;\nvoid main(){\ngl_Position.xyz = vertexPosition_modelspace;\ngl_Position.w = 1.0;\n}";
+	const std::string vtxShaderCode = "#version 330 core\nlayout(location = 0) in vec3 vertexPosition_modelspace;\nuniform mat4 proj;\nvoid main(){\ngl_Position = vec4(vertexPosition_modelspace, 1) * proj;\n}";
 	const auto* vtxShaderCodePtr = vtxShaderCode.c_str();
 	glShaderSource(vtxShaderId, 1, &vtxShaderCodePtr, NULL);
 	glCompileShader(vtxShaderId);
@@ -169,6 +178,8 @@ void OGLWidget::initializeGL() {
 	glDeleteShader(fragShaderId);
 
 	glUseProgram(progId);
+
+	matrixId = glGetUniformLocation(progId, "proj");
 }
 
 void OGLWidget::resizeGL(int w, int h) {
@@ -178,35 +189,22 @@ void OGLWidget::resizeGL(int w, int h) {
 }
 
 void OGLWidget::paintGL() {
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
+	
 	const auto invZoom = 1 / zoomFactor;
-	glOrtho(
-		cameraPanX,
-		cameraPanX + widgetWidth*invZoom,
-		cameraPanY + widgetHeight*invZoom,
-		cameraPanY, 
-		-1, +1);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	// glBindTexture(GL_TEXTURE_2D, textureId);
-	// glBegin(GL_QUADS); 
-	// 	glTexCoord2f(0.f, 0.f); glVertex2f(0, 0);
-	// 	glTexCoord2f(1.f, 0.f); glVertex2f(imageWidth, 0);
-	// 	glTexCoord2f(1.f, 1.f); glVertex2f(imageWidth, imageHeight);
-	// 	glTexCoord2f(0.f, 1.f); glVertex2f(0, imageHeight);
-	// glEnd();
+	const auto left = cameraPanX;
+	const auto right = cameraPanX + widgetWidth*invZoom;
+	const auto bottom = cameraPanY + widgetHeight*invZoom;
+	const auto top = cameraPanY;
+	const auto A = 2.0f / (right - left);
+	const auto B = 2.0f / (top - bottom);
+	const auto C = -1;
+	const auto tx = -(right + left) / (right - left);
+	const auto ty = -(top + bottom) / (top - bottom);
+	const auto tz = 0;
+	const std::array<GLfloat, 16> mat{A, 0, 0, tx, 0, B, 0, ty, 0, 0, C, tz, 0, 0, 0, 1};
+	glUniformMatrix4fv(matrixId, 1, GL_FALSE, mat.data());
 
 	glClear(GL_COLOR_BUFFER_BIT);
-
-	const GLfloat vtxBufData[] = {
-		      0.0f,        0.0f, 0.0f,
-		imageWidth,        0.0f, 0.0f,
-		imageWidth,	imageHeight, 0.0f,
-		      0.0f,	imageHeight, 0.0f
-	};
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vtxBufData), vtxBufData, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vtxBuf);
