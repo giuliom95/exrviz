@@ -162,8 +162,9 @@ void OGLWidget::initializeGL() {
 	const std::string fragShaderCode = "#version 330 core\n"
 	"in vec2 uv;"
 	"out vec3 color;"
+	"uniform sampler2D image;"
 	"void main(){"
-		"color = vec3(uv.x,0,uv.y);"
+		"color = texture(image, uv).rgb;"
 	"}";
 	const auto* fragShaderCodePtr = fragShaderCode.c_str();
 	glShaderSource(fragShaderId, 1, &fragShaderCodePtr, NULL);
@@ -201,7 +202,8 @@ void OGLWidget::initializeGL() {
 
 	glUseProgram(progId);
 
-	matrixId = glGetUniformLocation(progId, "proj");
+	matrixLocationId = glGetUniformLocation(progId, "proj");
+	textureLocationId = glGetUniformLocation(progId, "image");
 }
 
 void OGLWidget::resizeGL(int w, int h) {
@@ -224,32 +226,23 @@ void OGLWidget::paintGL() {
 	const auto ty = -(top + bottom) / (top - bottom);
 	const auto tz = 0;
 	const std::array<GLfloat, 16> mat{A, 0, 0, tx, 0, B, 0, ty, 0, 0, C, tz, 0, 0, 0, 1};
-	glUniformMatrix4fv(matrixId, 1, GL_FALSE, mat.data());
+	glUniformMatrix4fv(matrixLocationId, 1, GL_FALSE, mat.data());
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textureId);
+	glUniform1i(textureLocationId, 0);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vtxBuf);
-	glVertexAttribPointer(
-		0,			// attribute 0. No particular reason for 0, but must match the layout in the shader.
-		2,			// size
-		GL_FLOAT,	// type
-		GL_FALSE,	// normalized?
-		0,			// stride
-		(void*)NULL	// array buffer offset
-	);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, uvBuf);
-	glVertexAttribPointer(
-		1,			// attribute 1. No particular reason for 0, but must match the layout in the shader.
-		2,			// size
-		GL_FLOAT,	// type
-		GL_FALSE,	// normalized?
-		0,			// stride
-		(void*)NULL	// array buffer offset
-	);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 	
+
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);

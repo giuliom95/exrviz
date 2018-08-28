@@ -61,7 +61,8 @@ private:
 	GLuint textureId;
 	GLuint vtxBuf;
 	GLuint uvBuf;
-	GLuint matrixId;
+	GLuint matrixLocationId;
+	GLuint textureLocationId;
 	QOpenGLVertexArrayObject vao;
 };
 
