@@ -11,9 +11,8 @@ OpenEXR image visualizer. Written in C++ and Qt5.
 
 ### Planned features
 
-- Zoom reset button
-- Exposure and gamma slider
-- Tonemapping on the GPU for better performances
+- Better exposure slider
+- Gamma slider
 
 ## How to compile and run
 
