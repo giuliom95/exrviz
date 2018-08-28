@@ -279,6 +279,6 @@ void OGLWidget::updateImage() {
 		data[i][2] = (float)hdrImage[i].b;
 	}
 	glBindTexture(GL_TEXTURE_2D, textureId);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageWidth, imageHeight, 0, GL_RGB, GL_FLOAT, data.data());
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, imageWidth, imageHeight, 0, GL_RGB, GL_FLOAT, data.data());
 	update();
 }
