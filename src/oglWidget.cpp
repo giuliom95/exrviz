@@ -48,7 +48,7 @@ void OGLWidget::changeImage(const std::vector<Imf::Rgba>& img,
 
 void OGLWidget::changeExposure(float e) {
 	exposure = e;
-	updateImage();
+	update();
 }
 
 
@@ -123,13 +123,13 @@ void OGLWidget::initializeGL() {
 	"in vec2 uv;"
 	"out vec3 color;"
 	"uniform sampler2D image;"
+	"uniform float exposure;"
 	"void main(){"
-		"float exposure = 0.0f;"
 		"float a = pow(2, exposure + 2.47393f);"
-		"float b = 84.66f / 255.0f;"
-		"vec3 invGamma = vec3(1 / 2.2f);"
+		"float b = 84.66f;"
+		"float invGamma = 1 / 2.2f;"
 		"vec3 hdr = texture(image, uv).rgb;"
-		"color = clamp(b*pow(a*hdr, invGamma), 0.0f, 1.0f);"
+		"color = clamp(b*pow(a*hdr, vec3(invGamma)), 0.0f, 255.0f) / 255.0f;"
 	"}";
 	const auto* fragShaderCodePtr = fragShaderCode.c_str();
 	glShaderSource(fragShaderId, 1, &fragShaderCodePtr, NULL);
@@ -169,6 +169,7 @@ void OGLWidget::initializeGL() {
 
 	matrixLocationId = glGetUniformLocation(progId, "proj");
 	textureLocationId = glGetUniformLocation(progId, "image");
+	exposureLocationId = glGetUniformLocation(progId, "exposure");
 }
 
 void OGLWidget::resizeGL(int w, int h) {
@@ -196,6 +197,8 @@ void OGLWidget::paintGL() {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textureId);
 	glUniform1i(textureLocationId, 0);
+
+	glUniform1f(exposureLocationId, exposure);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
