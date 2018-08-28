@@ -53,12 +53,18 @@ private:
 	float zoomFactor;
 	float widgetAspectRatio;
 
-	GLuint textureId;
-
 	bool mousePressed;
 
 	QLabel& pixelInfoLabel;
 	QPushButton& zoomButton;
+
+	GLuint textureId;
+	GLuint vtxBuf;
+	GLuint uvBuf;
+	GLuint matrixLocationId;
+	GLuint textureLocationId;
+	GLuint exposureLocationId;
+	QOpenGLVertexArrayObject vao;
 };
 
 #endif
