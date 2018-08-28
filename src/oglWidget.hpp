@@ -60,6 +60,7 @@ private:
 
 	GLuint textureId;
 	GLuint vtxBuf;
+	GLuint uvBuf;
 	GLuint matrixId;
 	QOpenGLVertexArrayObject vao;
 };

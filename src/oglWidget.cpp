@@ -63,12 +63,24 @@ void OGLWidget::changeImage(const std::vector<Imf::Rgba>& img,
 	hdrImage = img;
 
 	const GLfloat vtxBufData[] = {
-		0.0f, 0.0f, 0.0f,
-		   w, 0.0f, 0.0f,
-		0.0f,    h, 0.0f,
-		   w,    h, 0.0f
+		0.0f, 0.0f,
+		   w, 0.0f,
+		0.0f,    h,
+		   w,    h
 	};
+	glGenBuffers(1, &vtxBuf);
+	glBindBuffer(GL_ARRAY_BUFFER, vtxBuf);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vtxBufData), vtxBufData, GL_STATIC_DRAW);
+
+	const GLfloat uvBufData[] = {
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		0.0f, 1.0f,
+		1.0f, 1.0f
+	};
+	glGenBuffers(1, &uvBuf);
+	glBindBuffer(GL_ARRAY_BUFFER, uvBuf);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(uvBufData), uvBufData, GL_STATIC_DRAW);
 
 	updateImage();
 }
@@ -108,11 +120,6 @@ void OGLWidget::initializeGL() {
 	vao.create();
 	vao.bind();
 
-	// Generate 1 buffer, put the resulting identifier in vertexbuffer
-	glGenBuffers(1, &vtxBuf);
-	// The following commands will talk about our 'vtxBuf' buffer
-	glBindBuffer(GL_ARRAY_BUFFER, vtxBuf);
-
 	glGenTextures(1, &textureId);
 	glBindTexture(GL_TEXTURE_2D, textureId);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -122,12 +129,22 @@ void OGLWidget::initializeGL() {
 	const auto vtxShaderId = glCreateShader(GL_VERTEX_SHADER);
 	const auto fragShaderId = glCreateShader(GL_FRAGMENT_SHADER);
 
-
 	GLint result = GL_FALSE;
 	int infoLogLen;
 
 	// Compile Vertex Shader
-	const std::string vtxShaderCode = "#version 330 core\nlayout(location = 0) in vec3 vertexPosition_modelspace;\nuniform mat4 proj;\nvoid main(){\ngl_Position = vec4(vertexPosition_modelspace, 1) * proj;\n}";
+	const std::string vtxShaderCode = "#version 330 core \n"
+	"layout(location = 0) in vec2 vtx_pos;"
+	"layout(location = 1) in vec2 vtx_uv;"
+	"out vec2 uv;"
+	"uniform mat4 proj;"
+	"void main(){"
+		"gl_Position.xy = vtx_pos;"
+		"gl_Position.z = 0.0f;"
+		"gl_Position.w = 1.0f;"
+		"gl_Position = gl_Position * proj;"
+		"uv = vtx_uv;"
+	"}";
 	const auto* vtxShaderCodePtr = vtxShaderCode.c_str();
 	glShaderSource(vtxShaderId, 1, &vtxShaderCodePtr, NULL);
 	glCompileShader(vtxShaderId);
@@ -142,7 +159,12 @@ void OGLWidget::initializeGL() {
 	}
 
 	// Compile Frag Shader
-	const std::string fragShaderCode = "#version 330 core\nout vec3 color;\nvoid main(){\ncolor = vec3(1,0,0);\n}";
+	const std::string fragShaderCode = "#version 330 core\n"
+	"in vec2 uv;"
+	"out vec3 color;"
+	"void main(){"
+		"color = vec3(uv.x,0,uv.y);"
+	"}";
 	const auto* fragShaderCodePtr = fragShaderCode.c_str();
 	glShaderSource(fragShaderId, 1, &fragShaderCodePtr, NULL);
 	glCompileShader(fragShaderId);
@@ -210,15 +232,27 @@ void OGLWidget::paintGL() {
 	glBindBuffer(GL_ARRAY_BUFFER, vtxBuf);
 	glVertexAttribPointer(
 		0,			// attribute 0. No particular reason for 0, but must match the layout in the shader.
-		3,			// size
+		2,			// size
 		GL_FLOAT,	// type
 		GL_FALSE,	// normalized?
 		0,			// stride
 		(void*)NULL	// array buffer offset
 	);
-	// Draw the triangle !
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Starting from vertex 0; 3 vertices total -> 1 triangle
+
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, uvBuf);
+	glVertexAttribPointer(
+		1,			// attribute 1. No particular reason for 0, but must match the layout in the shader.
+		2,			// size
+		GL_FLOAT,	// type
+		GL_FALSE,	// normalized?
+		0,			// stride
+		(void*)NULL	// array buffer offset
+	);
+	
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
 }
 
 void OGLWidget::mousePressEvent(QMouseEvent* event) {
