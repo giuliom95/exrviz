@@ -31,5 +31,10 @@ int main(int argc, char** argv) {
 	read_exr(argv[1], img, img_w, img_h);
 	win.changeImage(img, img_w, img_h);
 
+	std::stringstream stream;
+	stream << "exrviz - " << argv[1];
+	stream.str().c_str();
+	win.setWindowTitle(stream.str().c_str());
+
 	return app.exec();
 }
