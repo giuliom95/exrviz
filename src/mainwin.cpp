@@ -6,10 +6,12 @@ ExrVizMainWindow::ExrVizMainWindow() : QWidget() {
 
 	QVBoxLayout* mainLayout = new QVBoxLayout;
 	mainLayout->setContentsMargins(0,0,0,0);
+	mainLayout->setSpacing(0);
 
 	QWidget* topBarLayoutContainer = new QWidget;	// This is used to give a fixed height to the layout
-	topBarLayoutContainer->setFixedHeight(30);
+	topBarLayoutContainer->setFixedHeight(25);
 	QHBoxLayout* topBarLayout = new QHBoxLayout;
+	topBarLayout->setContentsMargins(5,0,5,0);
 	QLabel* exposureLabel = new QLabel("Exposure: ");
 	exposureSlider = new QSlider(Qt::Horizontal);
 	exposureSlider->setMinimum(-50);
@@ -20,8 +22,9 @@ ExrVizMainWindow::ExrVizMainWindow() : QWidget() {
 	topBarLayoutContainer->setLayout(topBarLayout);
 
 	QWidget* bottomBarLayoutContainer = new QWidget;	// This is used to give a fixed height to the layout
-	bottomBarLayoutContainer->setFixedHeight(30);
+	bottomBarLayoutContainer->setFixedHeight(25);
 	QHBoxLayout* bottomBarLayout = new QHBoxLayout;
+	bottomBarLayout->setContentsMargins(0,0,5,0);
 	zoomButton = new QPushButton("100.0%");
 	zoomButton->setFixedWidth(70);
 	QLabel* pixelInfoLabel = new QLabel("Cursor not on image");
