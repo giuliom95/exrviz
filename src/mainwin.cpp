@@ -12,13 +12,17 @@ ExrVizMainWindow::ExrVizMainWindow() : QWidget() {
 	topBarLayoutContainer->setFixedHeight(25);
 	QHBoxLayout* topBarLayout = new QHBoxLayout;
 	topBarLayout->setContentsMargins(5,0,5,0);
-	QLabel* exposureLabel = new QLabel("Exposure: ");
+	exposureLabel = new QLabel("Exposure:  +0.00");
+	exposureLabel->setFixedWidth(115);
 	exposureSlider = new QSlider(Qt::Horizontal);
 	exposureSlider->setMinimum(-50);
 	exposureSlider->setMaximum(+50);
+	exposureSlider->setTickPosition(QSlider::TicksBothSides);
+	exposureSlider->setFixedWidth(400);
 	exposureSlider->setValue(0);
 	topBarLayout->addWidget(exposureLabel);
 	topBarLayout->addWidget(exposureSlider);
+	topBarLayout->addStretch();
 	topBarLayoutContainer->setLayout(topBarLayout);
 
 	QWidget* bottomBarLayoutContainer = new QWidget;	// This is used to give a fixed height to the layout
@@ -51,5 +55,14 @@ void ExrVizMainWindow::handleZoomButton() {
 }
 
 void ExrVizMainWindow::handleExposureChange(int value) {
-	oglWidget->changeExposure(value / 10.0f);
+	const auto exp = value / 10.0f;
+
+	std::stringstream stream;
+	stream << std::fixed << std::setprecision(2);
+	stream << "Exposure:  ";
+	if (exp >= 0.0f) stream << "+";
+	stream << exp;
+	exposureLabel->setText(stream.str().c_str());
+
+	oglWidget->changeExposure(exp);
 }
