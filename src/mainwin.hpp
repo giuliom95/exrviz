@@ -17,9 +17,7 @@ public:
 	explicit ExrVizMainWindow();
 	
 	void changeImage(	const std::vector<Imf::Rgba>& inputHdrImage,
-						const int imageWidth, const int imageHeight) {
-		oglWidget->changeImage(inputHdrImage, imageWidth, imageHeight);
-	}
+						const int imageWidth, const int imageHeight);
 
 public slots:
 	void handleZoomButton();

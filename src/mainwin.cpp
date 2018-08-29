@@ -48,6 +48,11 @@ ExrVizMainWindow::ExrVizMainWindow() : QWidget() {
 	connect(exposureSlider,	SIGNAL (valueChanged(int)),	this, SLOT (handleExposureChange(int)));
 }
 
+void ExrVizMainWindow::changeImage(	const std::vector<Imf::Rgba>& inputHdrImage,
+									const int imageWidth, const int imageHeight) {
+	oglWidget->changeImage(inputHdrImage, imageWidth, imageHeight);
+}
+
 void ExrVizMainWindow::handleZoomButton() {
 	const auto cx = oglWidget->width() / 2;
 	const auto cy = oglWidget->height() / 2;
