@@ -42,7 +42,9 @@ void OGLWidget::changeImage(const std::vector<Imf::Rgba>& img,
 	glBindBuffer(GL_ARRAY_BUFFER, uvBuf);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(uvBufData), uvBufData, GL_STATIC_DRAW);
 
-	updateImage();
+	glBindTexture(GL_TEXTURE_2D, textureId);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, imageWidth, imageHeight, 0, GL_RGBA, GL_HALF_FLOAT, hdrImage.data());
+	update();
 }
 
 
@@ -268,17 +270,4 @@ void OGLWidget::wheelEvent(QWheelEvent *event) {
 	const auto newZoomFactor = zoomFactor + 0.5*scroll;
 
 	setZoom(newZoomFactor, mousePos.x(), mousePos.y());
-}
-
-void OGLWidget::updateImage() {
-	
-	std::vector<std::array<float, 3>> data{(size_t)imageWidth*imageHeight};
-	for(auto i = 0; i < imageWidth*imageHeight; ++i) {
-		data[i][0] = (float)hdrImage[i].r;
-		data[i][1] = (float)hdrImage[i].g;
-		data[i][2] = (float)hdrImage[i].b;
-	}
-	glBindTexture(GL_TEXTURE_2D, textureId);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, imageWidth, imageHeight, 0, GL_RGB, GL_FLOAT, data.data());
-	update();
 }
