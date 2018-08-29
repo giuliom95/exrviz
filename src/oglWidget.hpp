@@ -39,8 +39,6 @@ protected:
 	void wheelEvent(QWheelEvent *event);
 
 private:
-	void updateImage();
-
 	std::vector<Imf::Rgba> hdrImage;
 
 	int		widgetWidth,	widgetHeight;
