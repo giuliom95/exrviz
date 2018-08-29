@@ -11,8 +11,8 @@ OpenEXR image visualizer. Written in C++ and Qt5.
 
 ### Planned features
 
-- Better exposure slider
 - Gamma slider
+- Better style
 
 ## How to compile and run
 

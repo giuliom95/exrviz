@@ -6,22 +6,29 @@ ExrVizMainWindow::ExrVizMainWindow() : QWidget() {
 
 	QVBoxLayout* mainLayout = new QVBoxLayout;
 	mainLayout->setContentsMargins(0,0,0,0);
+	mainLayout->setSpacing(0);
 
 	QWidget* topBarLayoutContainer = new QWidget;	// This is used to give a fixed height to the layout
-	topBarLayoutContainer->setFixedHeight(30);
+	topBarLayoutContainer->setFixedHeight(25);
 	QHBoxLayout* topBarLayout = new QHBoxLayout;
-	QLabel* exposureLabel = new QLabel("Exposure: ");
+	topBarLayout->setContentsMargins(5,0,5,0);
+	exposureLabel = new QLabel("Exposure:  +0.00");
+	exposureLabel->setFixedWidth(115);
 	exposureSlider = new QSlider(Qt::Horizontal);
 	exposureSlider->setMinimum(-50);
 	exposureSlider->setMaximum(+50);
+	exposureSlider->setTickPosition(QSlider::TicksBothSides);
+	exposureSlider->setFixedWidth(400);
 	exposureSlider->setValue(0);
 	topBarLayout->addWidget(exposureLabel);
 	topBarLayout->addWidget(exposureSlider);
+	topBarLayout->addStretch();
 	topBarLayoutContainer->setLayout(topBarLayout);
 
 	QWidget* bottomBarLayoutContainer = new QWidget;	// This is used to give a fixed height to the layout
-	bottomBarLayoutContainer->setFixedHeight(30);
+	bottomBarLayoutContainer->setFixedHeight(25);
 	QHBoxLayout* bottomBarLayout = new QHBoxLayout;
+	bottomBarLayout->setContentsMargins(0,0,5,0);
 	zoomButton = new QPushButton("100.0%");
 	zoomButton->setFixedWidth(70);
 	QLabel* pixelInfoLabel = new QLabel("Cursor not on image");
@@ -48,5 +55,14 @@ void ExrVizMainWindow::handleZoomButton() {
 }
 
 void ExrVizMainWindow::handleExposureChange(int value) {
-	oglWidget->changeExposure(value / 10.0f);
+	const auto exp = value / 10.0f;
+
+	std::stringstream stream;
+	stream << std::fixed << std::setprecision(2);
+	stream << "Exposure:  ";
+	if (exp >= 0.0f) stream << "+";
+	stream << exp;
+	exposureLabel->setText(stream.str().c_str());
+
+	oglWidget->changeExposure(exp);
 }

@@ -26,9 +26,10 @@ public slots:
 	void handleExposureChange(int);
 
 private:
-	QPushButton* zoomButton;
-	QSlider* exposureSlider;
-	OGLWidget* oglWidget;
+	QPushButton*	zoomButton;
+	QLabel*			exposureLabel;
+	QSlider*		exposureSlider;
+	OGLWidget*		oglWidget;
 };
 
 #endif
