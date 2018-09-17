@@ -22,26 +22,6 @@ void OGLWidget::changeImage(const std::vector<Imf::Rgba>& img,
 	imageHeight = h;
 	hdrImage = img;
 
-	const GLfloat vtxBufData[] = {
-		0.0f, 0.0f,
-		   w, 0.0f,
-		0.0f,    h,
-		   w,    h
-	};
-	glGenBuffers(1, &vtxBuf);
-	glBindBuffer(GL_ARRAY_BUFFER, vtxBuf);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vtxBufData), vtxBufData, GL_STATIC_DRAW);
-
-	const GLfloat uvBufData[] = {
-		0.0f, 0.0f,
-		1.0f, 0.0f,
-		0.0f, 1.0f,
-		1.0f, 1.0f
-	};
-	glGenBuffers(1, &uvBuf);
-	glBindBuffer(GL_ARRAY_BUFFER, uvBuf);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(uvBufData), uvBufData, GL_STATIC_DRAW);
-
 	glBindTexture(GL_TEXTURE_2D, textureId);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, imageWidth, imageHeight, 0, GL_RGBA, GL_HALF_FLOAT, hdrImage.data());
 	update();
@@ -172,6 +152,9 @@ void OGLWidget::initializeGL() {
 	matrixLocationId = glGetUniformLocation(progId, "proj");
 	textureLocationId = glGetUniformLocation(progId, "image");
 	exposureLocationId = glGetUniformLocation(progId, "exposure");
+
+	glGenBuffers(1, &uvBuf);
+	glGenBuffers(1, &vtxBuf);
 }
 
 void OGLWidget::resizeGL(int w, int h) {
@@ -203,15 +186,28 @@ void OGLWidget::paintGL() {
 	glUniform1f(exposureLocationId, exposure);
 
 	glClear(GL_COLOR_BUFFER_BIT);
-
-	glEnableVertexAttribArray(0);
+	
+	const GLfloat vtxBufData[] = {
+			  0.0f, 0.0f,
+		imageWidth, 0.0f,
+			  0.0f, imageHeight,
+		imageWidth, imageHeight
+	};
 	glBindBuffer(GL_ARRAY_BUFFER, vtxBuf);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vtxBufData), vtxBufData, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
-	glEnableVertexAttribArray(1);
+	const GLfloat uvBufData[] = {
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		0.0f, 1.0f,
+		1.0f, 1.0f
+	};
 	glBindBuffer(GL_ARRAY_BUFFER, uvBuf);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(uvBufData), uvBufData, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
-	
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glDisableVertexAttribArray(0);
