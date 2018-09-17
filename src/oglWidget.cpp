@@ -7,8 +7,8 @@ OGLWidget::OGLWidget(	QLabel& pixelInfoLabel,
 													exposure{0.0f},
 													zoomFactor{1},
 													mousePressed{false},
-													pixelInfoLabel{pixelInfoLabel},
-													zoomButton{zoomButton},
+													pixelInfoLabel(pixelInfoLabel),
+													zoomButton(zoomButton),
 													vao{} {
 	QSurfaceFormat format;
 	format.setProfile(QSurfaceFormat::CoreProfile);
